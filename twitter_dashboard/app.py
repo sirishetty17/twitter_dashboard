@@ -1,20 +1,29 @@
-from flask import Flask, render_template
+import os
+import io
+
 import pandas as pd
-from textblob import TextBlob
+from flask import Flask, redirect, render_template, request, send_file, url_for
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-from flask import send_file
-import io
-from flask import Flask, render_template, request, redirect, url_for
-import pandas as pd
-import os
+from textblob import TextBlob
+
+try:
+    from .xquik_csv import normalize_tweet_frame
+except ImportError:
+    from xquik_csv import normalize_tweet_frame
 
 app = Flask(__name__)
 
 UPLOAD_FOLDER = "data"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-df = pd.read_csv("data/tweets.csv")
+
+def dataset_path():
+    return os.path.join(app.config["UPLOAD_FOLDER"], "tweets.csv")
+
+
+def load_tweets():
+    return normalize_tweet_frame(pd.read_csv(dataset_path()))
 
 # Sentiment function
 def get_sentiment(text):
@@ -50,6 +59,7 @@ def home():
 
 @app.route('/dashboard')
 def dashboard():
+    df = load_tweets()
 
     total_tweets = len(df)
     total_users = df['user_id'].nunique()
@@ -81,6 +91,7 @@ def dashboard():
 
 @app.route('/download_report')
 def download_report():
+    df = load_tweets()
 
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
@@ -122,7 +133,8 @@ def upload_file():
 
     if file:
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], "tweets.csv")
-        file.save(filepath)
+        uploaded = normalize_tweet_frame(pd.read_csv(file))
+        uploaded.to_csv(filepath, index=False)
 
     return redirect(url_for('dashboard'))
 
