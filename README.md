@@ -11,6 +11,7 @@ The objective of this project is to demonstrate how social media data can be ana
 ## 🚀 Features
 
 - Upload Twitter dataset (CSV)
+- Upload Xquik or other Twitter/X export CSV files without renaming columns
 - Sentiment Analysis (Positive, Negative, Neutral)
 - Rule-based Bot Detection
 - Interactive Pie Charts using Chart.js
@@ -64,6 +65,23 @@ Twitter-Bot-Analysis/
 - Interactive charts
 - Search tweets instantly
 - Download analysis report as PDF
+
+## CSV Upload Format
+
+The dashboard stores uploads as `data/tweets.csv` with these columns:
+
+| Column | Meaning |
+|--------|---------|
+| `user_id` | User, handle, or author identifier |
+| `tweet` | Tweet text |
+| `followers` | Follower count |
+| `following` | Following count |
+| `tweets_count` | Lifetime tweet/status count |
+
+Uploads from Xquik and common Twitter/X exports are normalized automatically.
+Aliases such as `username`, `screen_name`, `full_text`, `tweet_text`,
+`followers_count`, `following_count`, and `tweet_count` are accepted. Missing
+numeric bot-detection fields default to `0`, and blank tweet rows are skipped.
 
 ---
 
